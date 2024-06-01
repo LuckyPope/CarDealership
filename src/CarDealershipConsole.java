@@ -1,24 +1,27 @@
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CarDealershipConsole {
     private final CarDealership cd = new CarDealership();
+    private final DataBase db = new DataBase();
     int currentCode = 0;
     Scanner sc = new Scanner(System.in);
 
-    public void initializeCarDealerShip() throws IOException {
+    public void initializeCarDealerShip() throws IOException, SQLException {
         // Получать данные из СУДБ и заполнять списки машин, пользователей - 2 атта
-        cd.addCar("BMW", "M5F90");
-        cd.addCar("BMW",  "X5M");
-        cd.addCar("Mercedes", "E63S AMG");
-        cd.addCar("Mercedes", "GLE");
-        cd.addCar("Toyota", "Mark ||");
-
-        cd.addCustomer("Иванов Сидор Петрович", 25, true);
-        cd.addCustomer("Семенов Евгений Иванович", 35, true);
-        cd.addCustomer("Черных Мария Павловна", 37, false);
-        cd.addCustomer("Теплая Ирина Михайловна", 22, false);
+        cd.fillData(db.getCars(), db.getCustomers(), db.getSoldCars());
+//        cd.addCar("BMW", "M5F90");
+//        cd.addCar("BMW",  "X5M");
+//        cd.addCar("Mercedes", "E63S AMG");
+//        cd.addCar("Mercedes", "GLE");
+//        cd.addCar("Toyota", "Mark ||");
+//
+//        cd.addCustomer("Иванов Сидор Петрович", 25, true);
+//        cd.addCustomer("Семенов Евгений Иванович", 35, true);
+//        cd.addCustomer("Черных Мария Павловна", 37, false);
+//        cd.addCustomer("Теплая Ирина Михайловна", 22, false);
 
         while (currentCode != -1) {
             System.out.println("------------------ Добро пожаловать в автосалон DivanCar ------------------");
@@ -63,7 +66,7 @@ public class CarDealershipConsole {
 
     }
 
-    public void checkCars() {
+    public void checkCars() throws SQLException {
         ArrayList<Car> cars = cd.getCars();
         while (currentCode != -2) {
             showCars();
@@ -71,12 +74,12 @@ public class CarDealershipConsole {
             if (currentCode == 0) {
                 currentCode = -2;
             } else if (currentCode - 1 >= 0 && currentCode <= cars.size()) {
-                workWithCar(currentCode - 1);
+                workWithCar(currentCode);
             }
         }
     }
 
-    public void showCars() {
+    public void showCars() throws SQLException {
         ArrayList<Car> cars = cd.getCars();
         System.out.println("--------------------------- Список автомобилей --------------------------------");
         System.out.println();
@@ -84,14 +87,14 @@ public class CarDealershipConsole {
         System.out.println();
         System.out.println(0 + ". Назад");
         for (Car car : cars) {
-            System.out.println("Номер: " + (car.getID() + 1) + " Марка: " + car.getBrand() + "; Модель: " + car.getModel());
+            System.out.println("Номер: " + car.getID() + " Марка: " + car.getBrand() + "; Модель: " + car.getModel());
         }
         System.out.println();
         System.out.println("---------------------------------------------------------------------------");
         currentCode = Integer.parseInt(sc.nextLine());
     }
 
-    public void workWithCar(int id) {
+    public void workWithCar(int id) throws SQLException {
         Car currentCar = cd.getCars().get(id);
         String newValue = "";
         while (currentCode != -2) {
@@ -139,15 +142,18 @@ public class CarDealershipConsole {
                                     break;
                             }
                         }
+                        db.editCar(currentCar);
                         break;
                     case (2):
                         cd.deleteCar(id);
+                        currentCode = -2;
+                        break;
                 }
             }
         }
     }
 
-    public void checkCustomers() {
+    public void checkCustomers() throws SQLException {
         ArrayList<Customer> customers = cd.getCustomers();
         while (currentCode != -2) {
             showCustomers();
@@ -155,12 +161,12 @@ public class CarDealershipConsole {
             if (currentCode == 0) {
                 currentCode = -2;
             } else if (currentCode - 1 >= 0 && currentCode <= customers.size()) {
-                workWithCustomer(currentCode - 1);
+                workWithCustomer(currentCode);
             }
         }
     }
 
-    public void showCustomers() {
+    public void showCustomers() throws SQLException {
         ArrayList<Customer> customers = cd.getCustomers();
         System.out.println("--------------------------- Список автомобилей --------------------------------");
         System.out.println();
@@ -169,13 +175,13 @@ public class CarDealershipConsole {
         System.out.println(0 + ". Назад");
         for (Customer customer : customers) {
             String gender = (customer.getGender() ? "Мужской" : "Женский");
-            System.out.println("Номер: " + (customer.getID() + 1) + " Имя: " + customer.getName() + "; Возраст: " + customer.getAge() + "; Пол: " + gender);
+            System.out.println("Номер: " + customer.getID() + " Имя: " + customer.getName() + "; Возраст: " + customer.getAge() + "; Пол: " + gender);
         }
         System.out.println();
         System.out.println("---------------------------------------------------------------------------");
         currentCode = Integer.parseInt(sc.nextLine());
     }
-    public void workWithCustomer(int id) {
+    public void workWithCustomer(int id) throws SQLException {
         Customer currentCustomer = cd.getCustomers().get(id);
         String newValue = "";
         while (currentCode != -2) {
@@ -233,15 +239,18 @@ public class CarDealershipConsole {
                                     break;
                             }
                         }
+                        db.editCustomer(currentCustomer);
                         break;
                     case (2):
                         cd.deleteCustomer(id);
+                        currentCode = -2;
+                        break;
                 }
             }
         }
     }
 
-    public void addCar() {
+    public void addCar() throws SQLException {
         String model = "";
         String brand = "";
         System.out.println("--------------------------- Добавление нового автомобиля --------------------------------");
@@ -254,7 +263,7 @@ public class CarDealershipConsole {
         System.out.println("Автомобиль добавлен.");
     }
 
-    public void addCustomer() {
+    public void addCustomer() throws SQLException {
         String name = "";
         int age = 0;
         boolean isMale = true;
@@ -274,7 +283,7 @@ public class CarDealershipConsole {
         System.out.println("Клиент добавлен.");
     }
 
-    public void sellCar() {
+    public void sellCar() throws SQLException {
         ArrayList<Car> cars = cd.getCars();
         ArrayList<Customer> customers = cd.getCustomers();
         Car currentCar = new Car(-1, "", "");
@@ -300,7 +309,7 @@ public class CarDealershipConsole {
         }
     }
 
-    public void checkSoldCars() {
+    public void checkSoldCars() throws SQLException {
         ArrayList<Car> cars = cd.getSoldCars();
 
         System.out.println("--------------------------- Список проданных автомобилей --------------------------------");

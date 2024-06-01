@@ -2,10 +2,10 @@ import java.util.ArrayList;
 
 public class Customer implements CustomerIn {
 
-    private final int ID;
+    private int ID;
     private String name;
     private int age;
-    boolean isMale;
+    private boolean isMale;
     private ArrayList<Car> cars = new ArrayList<>();
 
     public Customer(int id, String name, int age, boolean isMale) {
@@ -48,6 +48,11 @@ public class Customer implements CustomerIn {
             }
         }
         return resultCar;
+    }
+
+    @Override
+    public void setID(int newID) {
+        this.ID = newID;
     }
 
     @Override

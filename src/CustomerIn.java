@@ -13,6 +13,8 @@ public interface CustomerIn {
 
     Car getCar(String model, String brand);
 
+    void setID(int newID);
+
     void setName(String newName);
 
     void setAge(int newAge);
